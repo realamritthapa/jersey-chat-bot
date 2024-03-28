@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BroTalk: Jersey Shore Edition</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="chat-container">
+      <div id="chat-box">
+        <div class="ai-message">
+          Welcome to BroTalk: Jersey Shore Edition! Type your message below and
+          let's get this party started!
+        </div>
+      </div>
+      <input
+        type="text"
+        id="user-input"
+        placeholder="Type a message..."
+        onkeypress="if(event.keyCode==13) sendMessage()"
+      />
+    </div>
+    <script>
+      function sendMessage() {
+        let userInput = document.getElementById("user-input").value;
+        if (!userInput.trim()) return;
+        let chatBox = document.getElementById("chat-box");
+        chatBox.innerHTML += `<div class="user-message">${userInput}</div>`;
+        fetch("/ask", {
+          method: "POST",
+          body: new URLSearchParams("question=" + userInput),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            chatBox.innerHTML += `<div class="ai-message">${data.response}</div>`;
+            document.getElementById("user-input").value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+          });
+      }
+    </script>
+  </body>
+</html>
